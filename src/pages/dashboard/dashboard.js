@@ -3,6 +3,13 @@ console.log('Dashboard page loaded');
 document.addEventListener('DOMContentLoaded', () => {
 	console.log('DOM fully loaded and parsed');
 
+	window.electronAPI.on('app-ready', async () => {
+		const products = await window.electronAPI.invoke('db-query', {
+			sql: 'SELECT * FROM products'
+		});
+		console.log('Products:', products);
+	});
+
 	// Безопасный доступ к API
 	const electronAPI = window.electronAPI || {
 		invoke: () => console.warn('Electron API not available'),
@@ -11,9 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Навигация
 	document.querySelectorAll('.nav-btn').forEach(btn => {
-		btn.addEventListener('click', () => {
+		btn.addEventListener('click', async () => {
 			const page = btn.dataset.page;
-			electronAPI.invoke('create-window', page).catch(console.error);
+			try {
+				const result = await window.electronAPI.createWindow(page);
+				if (!result.success) {
+					console.error('Failed to create window');
+				}
+			} catch (err) {
+				console.error('IPC error:', err);
+			}
 		});
 	});
 
@@ -40,4 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	};
 
 	renderClients();
+
+
+	// -----------------
 });

@@ -290,5 +290,7 @@ npm install @electron-forge/cli jest -D # Dev-зависимости
 npx electron-forge import # Импорт настроек Electron Forge
 
 ```
-
+rm ~/AppData/Roaming/electron_sqlite_multi-window-d/nutrition.db
 ```
+
+sqlite3 "AppData/Roaming/electron_sqlite_multi-window-d/nutrition.db" ".tables"

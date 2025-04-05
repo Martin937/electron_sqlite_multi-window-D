@@ -51,8 +51,8 @@ class WindowManager {
 	static createWindow(pageName) {
 		const validPages = ['dashboard', 'nutritionTable', 'cookbook', 'nutritionSchedule'];
 		if (!validPages.includes(pageName)) {
-			electronLog.error(`Attempt to open invalid page: ${pageName}`);
-			return;
+			electronLog.error(`Invalid page: ${pageName}`);
+			return null; // Возвращаем null вместо ошибки
 		}
 
 		const win = new BrowserWindow({
@@ -60,23 +60,17 @@ class WindowManager {
 			height: 700,
 			webPreferences: {
 				preload: path.join(__dirname, '../renderer/preload.js'),
-				sandbox: true,
 				nodeIntegration: false,
 				contextIsolation: true
 			}
 		});
 
-		const pageUrl = url.format({
-			pathname: path.join(__dirname, `../pages/${pageName}/${pageName}.html`),
-			protocol: 'file:',
-			slashes: true
-		});
+		win.loadFile(path.join(__dirname, `../pages/${pageName}/${pageName}.html`));
 
-		win.loadURL(pageUrl);
 		this.windows.set(win.id, win);
-		electronLog.info(`Window for ${pageName} created (ID: ${win.id})`);
+		electronLog.info(`Created window for: ${pageName}`);
 
-		return win;
+		return win.id; // Возвращаем только ID окна вместо всего объекта
 	}
 
 	static applyThemeToAllWindows(theme) {
@@ -87,7 +81,11 @@ class WindowManager {
 
 	static setupIPCHandlers() {
 		ipcMain.handle('create-window', (event, pageName) => {
-			return this.createWindow(pageName);
+			const winId = this.createWindow(pageName);
+			return {
+				success: !!winId,
+				winId: winId || null
+			};
 		});
 	}
 }

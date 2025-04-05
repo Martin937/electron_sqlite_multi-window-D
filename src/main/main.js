@@ -2,7 +2,11 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const electronLog = require('electron-log');
 const WindowManager = require('./windows');
-const { initDatabase } = require('../database/database');
+const Database = require('../database/database');
+
+const fs = require('fs');
+const migrationsPath = path.join(__dirname, '../database/migrations');
+electronLog.info('Migration files:', fs.readdirSync(migrationsPath));
 
 // Конфигурация логов
 electronLog.initialize({ preload: true });
@@ -15,12 +19,18 @@ process.on('uncaughtException', (error) => {
 
 let mainWindow;
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
 	// Инициализация БД
-	// initDatabase().catch(err => {
-	// 	electronLog.error(`Database init failed: ${err.message}`);
-	// });
+	try {
+		await Database.connect();
+		// await Database.migrate();
+		electronLog.info('Database initialized');
+	} catch (err) {
+		electronLog.error('Database init failed:', err);
+	}
+
 	WindowManager.setupIPCHandlers();
+
 	// Создание главного окна
 	mainWindow = WindowManager.createMainWindow();
 

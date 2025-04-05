@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 // Минимальный безопасный API
 contextBridge.exposeInMainWorld('electronAPI', {
+	createWindow: (pageName) => ipcRenderer.invoke('create-window', pageName),
 	invoke: (channel, ...args) => {
 		const validChannels = ['switch-theme', 'create-window'];
 		if (validChannels.includes(channel)) {
@@ -14,5 +15,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
 		if (validChannels.includes(channel)) {
 			ipcRenderer.on(channel, listener);
 		}
-	}
+	},
 });

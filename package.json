@@ -8,8 +8,7 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "electron .",
-    "dev": "set NODE_ENV=development&&electron --enable-logging .",
+    "start": "set NODE_ENV=development&&electron --enable-logging .",
     "test": "jest",
     "test:watch": "jest --watch",
     "package": "electron-forge package",
