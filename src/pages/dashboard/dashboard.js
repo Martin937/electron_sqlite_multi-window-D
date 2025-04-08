@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Заглушка для данных клиентов
 	const clients = [
 		{ id: 1, name: 'Иван Петров', lastVisit: '2023-10-15' },
-		{ id: 2, name: 'Мария Сидорова', lastVisit: '2023-10-14' }
+		{ id: 2, name: 'Мария Сидорова', lastVisit: '2023-10-14' },
 	];
 
 	// Рендер списка клиентов

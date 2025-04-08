@@ -3,8 +3,39 @@ const path = require('path');
 const electronLog = require('electron-log');
 const WindowManager = require('./windows');
 const Database = require('../database/database');
-
 const fs = require('fs');
+
+if (process.env.NODE_ENV === 'development') {
+	try {
+		const electronReload = require('electron-reload');
+
+		electronReload(path.join(__dirname, '..'), {
+			electron: require('electron'),
+			ignored: [
+				/node_modules[\\/]/,
+				/\.db$/,
+				/\.json$/,
+				/src[\\/]database[\\/]/,
+				/src[\\/]assets[\\/]/,
+				/tests[\\/]/
+			],
+			argv: ['--enable-logging'],
+			hardResetMethod: 'exit',
+			forceHardReset: true,
+			chokidar: {
+				awaitWriteFinish: {
+					stabilityThreshold: 1000,
+					pollInterval: 100
+				}
+			}
+		});
+
+		electronLog.info('Hot-reload enabled in development mode');
+	} catch (err) {
+		electronLog.error('Hot-reload init error:', err);
+	}
+}
+
 const migrationsPath = path.join(__dirname, '../database/migrations');
 electronLog.info('Migration files:', fs.readdirSync(migrationsPath));
 
